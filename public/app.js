@@ -1,41 +1,41 @@
 (function($) {
 
 	$(function() {
-		$( "#popupYnPage" ).enhanceWithin().popup();
+		$( '#popupYnPage' ).enhanceWithin().popup();
 	});
 
 	//
 	// Loading
 	//
 	function showLoading() {
-		$("body").addClass('ui-disabled');
+		$('body').addClass('ui-disabled');
 		$.mobile.loading( 'show', {
-			text: "Loading",
+			text: 'Loading',
 			textVisible: true,
-			theme: "b",
+			theme: 'b',
 			textonly: false,
-			html: ""
+			html: ''
 		});
 	}
 
 	function hideLoading() {
-		$.mobile.loading("hide");
-		$("body").removeClass('ui-disabled');
+		$.mobile.loading('hide');
+		$('body').removeClass('ui-disabled');
 	}
 
 	//
 	// Y/N Page works
 	//
 	function emptyYnSelection() {
-		$("#ynPageConfirmationMsg").text("Please select files");
-		$("#pilla_btn_y").hide();
-		$("#pilla_btn_n").text("Back");
+		$('#ynPageConfirmationMsg').text('Please select files');
+		$('#pilla_btn_y').hide();
+		$('#pilla_btn_n').text('Back');
 	}
 
 	function updateYnMsg(msg) {
-		$("#ynPageConfirmationMsg").text(msg);
-		$("#pilla_btn_y").show();
-		$("#pilla_btn_n").text("No");
+		$('#ynPageConfirmationMsg').text(msg);
+		$('#pilla_btn_y').show();
+		$('#pilla_btn_n').text('No');
 	}
 
 	//
@@ -92,7 +92,7 @@
 		})
 		.fail(function(jqXHR, textStatus) {
 			hideLoading();
-			console.log("Error occur while getting mainlist" + textStatus);
+			console.log('Error occur while getting mainlist' + textStatus);
 		});
 	};
 
@@ -109,7 +109,7 @@
 		})
 		.fail(function(jqXHR, textStatus) {
 			hideLoading();
-			console.log("Error occur while getting playlist" + textStatus);
+			console.log('Error occur while getting playlist' + textStatus);
 		});
 	};
 
@@ -127,7 +127,7 @@
 		})
 		.fail(function(jqXHR, textStatus) {
 			hideLoading();
-			console.log("Error occur while getting play status" + textStatus);
+			console.log('Error occur while getting play status' + textStatus);
 		});
 	};
 
@@ -138,7 +138,7 @@
 			method: 'POST',
 			data: $('form#newPlaylistForm').serialize(),
 			//processData: false,
-			//contentType: "application/json",
+			//contentType: 'application/json',
 			//dataType: 'json',
 		timeout: 10000})
 		.done(function(data) {
@@ -147,7 +147,7 @@
 		.fail(function(jqXHR, textStatus) {
 			hideLoading();
 			$(':mobile-pagecontainer').pagecontainer('change', '#mainPage');
-			console.log("fail callback. xhr:" + textStatus);
+			console.log('fail callback. xhr:' + textStatus);
 			console.log(jqXHR);
 		});
 	};
@@ -215,7 +215,7 @@
 		$('#playMenuTrackPos').attr('max', playStatus.trackLength);
 		$('#playMenuTrackPos').val(playStatus.trackPos);
 		//$('#playMenuTrackPos').attr('value', playStatus.trackPos);
-		$('#playMenuTrackPos').slider("refresh");
+		$('#playMenuTrackPos').slider('refresh');
 
 		trackUpdater = window.setInterval(function() {
 			//var trackPos = $('#playMenuTrackPos').val();
@@ -223,9 +223,9 @@
 			$('#playMenuTrackPos').val(trackPos + 1);
 			if( (trackPos + 1) == $('#playMenuTrackPos').attr('max')) {
 				window.clearInterval(trackUpdater);
-				console.log("stop");
+				console.log('stop');
 			}
-			$('#playMenuTrackPos').slider("refresh");
+			$('#playMenuTrackPos').slider('refresh');
 		}, 1000);
 
 		//$('#pilla_playmenu_list').listview('refresh');
@@ -281,29 +281,29 @@
 		ajaxReqMainlist();
 
 		$(document).on('click', '.pilla_a_plName', function(e) {
-			console.log("playlist name");
+			console.log('playlist name');
 			$('#pilla_main_list li a').removeClass('ui-btn-b');
 			$(this).parent('li').children('a').addClass('ui-btn-b');
 		});
 
 		$(document).on('click', '.pilla_a_plLink', function(e) {
-			console.log("playlist link");
+			console.log('playlist link');
 			console.log($(this).parent('li').data());
 			ajaxReqPlaylist($(this).parent('li').data().name);
 		});
 
 		/*
-		$(".pilla_btn_play").on("click", function(e){
-			var data = [{name:"item1", count:3, default: 0}, {name:"item2", count: 4, default: 1}];
+		$('.pilla_btn_play').on('click', function(e){
+			var data = [{name:'item1', count:3, default: 0}, {name:'item2', count: 4, default: 1}];
 			pillaUpdateMainlist(data);
 		});
 		*/
 
-		$("#pilla_btn_newPlName").on("click", function(e){
+		$('#pilla_btn_newPlName').on('click', function(e){
 			ajaxReqNewFolder();
 		});
 
-		$(".pilla_btn_play_menu").on("click", function(e){
+		$('.pilla_btn_play_menu').on('click', function(e){
 			console.log('play_menu');
 			ajaxReqPlayStatus(1);
 		});
