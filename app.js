@@ -13,9 +13,12 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var errorhandler = require('errorhandler');
+var playlist = require('./lib/playlist');
+var filelist = require('./lib/filelist');
+var dir = process.argv[2] || "/home/perry/Music";
+filelist.defaultDir = dir;
 
 var _ = require('lodash');
-var fs = require('fs');
 var util = require('util');
 var async = require('async');
 
@@ -54,39 +57,19 @@ app.get('/musicinfo', function(req, res) {
 	res.json({fName:'musicstatusxx', fPath:'/music/test/a/xxx.mp3' , audio:'192 kbps, 44 kHz (stereo)', length:123});
 });
 
-app.get('/playlist', function(req, res) {
-	res.json([{name:'item1', count:3, default: 0}, {name:'item2', count: 4, default:1}]);
-});
+app.get('/playlist', playlist.getPlaylist);
 
-app.post('/playlist', function(req, res) {
-	console.log(req.body);
-	res.json({status: 'done'});
-});
+app.post('/playlist', playlist.createPlaylist);
 
-app.put('/playlist', function(req, res) {
-	console.log(req.body);
-	res.json({status: 'done'});
-});
+app.put('/playlist', playlist.deletePlaylist)
 
-app.get('/songs', function(req, res) {
-	console.log(req.query);
-res.json({name:'item1', items: [{name: 'music1', default:0, length:70, path:'f/a/b/xxx.mp3'}, {name: 'music2', default:1, length:90, path:'abc/a.mp3'}, {name: 'music3', default:0, length:121, path:'rew/b.mp3'}]});
-});
+app.get('/songs', playlist.getSongsFromPlaylist);
 
-app.post('/songs', function(req, res) {
-	console.log(req.body);
-	res.json({status: 'done'});
-});
+app.post('/songs', playlist.addSongsToPlaylist);
 
-app.put('/songs', function(req, res) {
-	console.log(req.query);
-	res.json({status: 'done'});
-});
+app.put('/songs', playlist.removeSongFromPlaylist);
 
-app.get('/songlist', function(req, res) {
-	console.log(req.query);
-	res.json({path:'/music/box/', items: [{name: 'music1.mp3', ext:'.mp3', type:0, count:0, path:'/music/box/music1.mp3'}, {name: 'music2.avi', ext:'.avi', type:0, count:0, path:'/music/box/music2.mp3'}, {name: 'folder1', ext:'' ,type:1, count:121, path:'/music/box/folder1'}, {name: 'folder2', ext:'', type:1, count:0, path:'/music/box/folder2'}]});
-});
+app.get('/songlist', filelist.getFilelist);
 
 /*
 app.get('/files', fileList.getFileList);

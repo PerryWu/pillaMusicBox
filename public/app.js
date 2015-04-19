@@ -3,6 +3,7 @@
 	var trackUpdater = null;
 	var lastAction = {};
 	var selectedSongs = {};
+	var currentSongPath = '';
 
 	$(function() {
 		$( '#popupYnPage' ).enhanceWithin().popup();
@@ -170,13 +171,15 @@
 		timeout: 10000})
 		.done(function(data) {
 			hideLoading();
+			$('#newPlaylistName').val('');
 			ajaxReqPlaylist();})
-			.fail(function(jqXHR, textStatus) {
-				hideLoading();
-				$(':mobile-pagecontainer').pagecontainer('change', '#mainPage');
-				console.log('fail callback. xhr:' + textStatus);
-				console.log(jqXHR);
-			});
+		.fail(function(jqXHR, textStatus) {
+			hideLoading();
+			$('#newPlaylistName').val('');
+			$(':mobile-pagecontainer').pagecontainer('change', '#mainPage');
+			console.log('fail callback. xhr:' + textStatus);
+			console.log(jqXHR);
+		});
 	};
 
 	function ajaxReqDeletePlaylist(playlist) {
@@ -273,6 +276,7 @@
 			//dataType: 'json',
 		timeout: 10000})
 		.done(function(data) {
+			currentSongPath = path;
 			hideLoading();
 			$(':mobile-pagecontainer').pagecontainer('change', '#songPage');
 			pillaUpdateSongList(data);})
@@ -392,10 +396,10 @@
 
 		for(i = 0; i < songs.items.length; i++) {
 			var liEntry;
-			if(songs.items[i].type === 0) {
-				liEntry = $('<li data-icon="false">').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '</a>');
+			if(songs.items[i].type === false) {
+				liEntry = $('<li data-icon="false">').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + humanSeconds(songs.items[i].mp3len) + '</span></a>');
 			} else {
-				liEntry = $('<li>').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + songs.items[i].count + '</span></a><a href="#" class="pilla_a_songlink">link</a>');
+				liEntry = $('<li>').html('<a href="#" class="pilla_a_songname"><i class="fa fa-folder"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + songs.items[i].count + '</span></a><a href="#" class="pilla_a_songlink">link</a>');
 			}
 
 			if(selectedSongs[songs.items[i].path] === 1) {
@@ -494,7 +498,7 @@
 
 		$(".pilla_btn_addsong").on("click", function(e) {
 			selectedSongs = {};
-			ajaxReqSongList('/');
+			ajaxReqSongList('');
 		});
 
 		$(".pilla_btn_ok").on("click", function(e) {
@@ -543,18 +547,18 @@
 			ajaxReqControl({action:'playmode', value:$(this).val()});
 		});
 
+		$(".pilla_btn_up").on("click", function(e){
+			if (!currentSongPath) return;
+			var idx = currentSongPath.lastIndexOf("/");
+			var path = currentSongPath.substr(0, idx);
+			ajaxReqSongList(path);
+		});
+
+		$(".pilla_btn_home").on("click", function(e){
+			ajaxReqSongList('');
+		});
+
 		/*
-		$("#mainPage .pilla_btn_up").on("click", function(e){
-		if (!currentMainPath) return;
-		var idx = currentMainPath.lastIndexOf("/");
-		var path = currentMainPath.substr(0, idx);
-		ajaxReqFileList('/files?path=' + path, path);
-		});
-
-		$("#treePage .pilla_btn_home").on("click", function(e){
-		ajaxReqFolderList('/folders', "");
-		});
-
 		$("#treePage .pilla_btn_up").on("click", function(e){
 		if (!currentTreePath) return;
 		var idx = currentTreePath.lastIndexOf("/");
