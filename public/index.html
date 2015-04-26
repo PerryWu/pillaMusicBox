@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Pilla File Browser</title>
+
+		<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+		<script src="js/jquery-1.11.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.5.min.js"></script>
+		<script src="app.js"></script>
+
+		<!--
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+		<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+		-->
+
+	</head>
+
+	<body>
+
+		<!-- Y/N Popup page -->
+		<div id="popupYnPage" data-theme="a">
+			<!-- This popup has its theme explicitly defined via data-theme="a"
+			because it has no parent from which to automatically inherit
+			its theme -->
+			<div data-role="header">
+				<h1>Confirmation </h1>
+			</div>
+			<div role="main" class="ui-content">
+				<h3 id="ynPageConfirmationMsg"> Are you sure to xxxx</h3>
+				<a href="#" id="pilla_btn_y" class="ui-btn" data-transition="flow">Yes</a>
+				<a href="#" id="pilla_btn_n" class="ui-btn" data-rel="back">No</a>
+			</div>
+		</div>
+
+		<!-- Main page -->
+		<div data-role="page" id="mainPage">
+			<div data-role="header">
+				<h1>Pilla Music Box</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#" class="pilla_btn_play" data-icon="audio">Play</a></li>
+						<li><a href="#" class="pilla_btn_Stop" data-icon="forbidden">Stop</a></li>
+						<li><a href="#" class="pilla_btn_previous" data-icon="carat-l">Previous</a></li>
+						<li><a href="#" class="pilla_btn_next" data-icon="carat-r">Next</a></li>
+						<li><a href="#" class="pilla_btn_pause" data-icon="bars">Pause</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<ul data-role="listview" data-inset="true" id="pilla_main_list" data-theme="a">
+					<li data-icon="carat-r"><a href="#" class='pilla_plName'>PlayList1 <span class="ui-li-count">3, playing</span></a><a href="#playlistPage" class="pilla_plLink">link</a></li>
+					<li data-icon="carat-r"><a href="#" class='pilla_plName'>PlayList2 <span class="ui-li-count">6</span></a><a href="#playlistPage" class='pilla_plLink'>link</a></li>
+
+				</ul>
+			</div>
+
+			<div data-role="footer" data-position="fixed" class="ui-btn">
+				<a href="#newPlaylistPage" class="pilla_btn_new_pl" data-role="button">New Playlist</a>
+				<a href="#" class="pilla_btn_play_menu" data-role="button">Play Menu</a>
+			</div> 
+		</div> 
+
+		<!-- New Playlist Page -->
+		<div data-role="page" id="newPlaylistPage">
+			<div data-role="header">
+				<a href="#" data-role="button" data-icon="back" data-rel="back">Back</a>
+				<h1>Create New Playlist</h1>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<form method="post" id="newPlaylistForm">
+					<div class="ui-field-contain">
+						<label for="newPlaylistName">Name:</label>
+						<input type="text" name="playlistname" id="newPlaylistName">
+					</div>
+					<input type="button" data-inline="true" value="Submit" id="pilla_btn_newPlName">
+				</form>
+			</div>
+		</div> 
+
+		<!-- Play Menu Page -->
+		<div data-role="page" id="playMenuPage">
+			<div data-role="header">
+				<a href="#" data-role="button" data-icon="back" data-rel="back">Back</a>
+				<h1>Play Menu</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#" class="pilla_btn_play" data-icon="audio">Play</a></li>
+						<li><a href="#" class="pilla_btn_Stop" data-icon="forbidden">Stop</a></li>
+						<li><a href="#" class="pilla_btn_previous" data-icon="carat-l">Previous</a></li>
+						<li><a href="#" class="pilla_btn_next" data-icon="carat-r">Next</a></li>
+						<li><a href="#" class="pilla_btn_pause" data-icon="bars">Pause</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<form method="post" id="playMenuform">
+					<ul data-role="listview" data-inset="true" id='pilla_playmenu_list'>
+						<li class="ui-field-contain">
+						<label for="playlist">Playlist</label>
+						<h3 name="playlist" id='playMenuPlaylistName'>Playlist Name</h3>
+						</li>
+						<li class="ui-field-contain">
+						<label for="playMode">Play Mode</label>
+						<select name="playMode" id="playMode">
+							<option value="0">Playlist Repeat</option>
+							<option value="1">Track Repeat</option>
+							<option value="2">Random</option>
+							<option value="3">Playlist</option>
+							<option value="4">Track</option>
+						</select>
+						</li>
+						<li class="ui-field-contain">
+						<label for="trackName">Track Name</label>
+						<h3 name="trackName">XXXXXXXXXXX</h3>
+						</li>
+						<li class="ui-field-contain">
+						<label for="trackInfo">Track Info</label>
+						<h3 name="trackInfo">XXXXXXXX</h3>
+						</li>
+						<li class="ui-field-contain">
+						<label for="volume">Volume</label>
+						<input type="range" name="volume" id="playMenuVolume" value="50" min="0" max="100" data-highlight="true">
+						</li>
+						<li class="ui-field-contain">
+						<label for="trackPos">Track Position</label>
+						<input type="range" name="trackPos" id="playMenuTrackPos" value="50" min="0" max="100" data-highlight="true">
+						</li>
+					</ul>
+				</form>
+
+			</div>
+
+		</div> 
+
+		<!-- Playlist page -->
+		<div data-role="page" id="playlistPage">
+			<div data-role="header">
+				<a href="#" data-role="button" data-icon="back" data-rel="back">Back</a>
+				<h1 id="playlistPageHeaderMsg">Playlist Name</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#" class="pilla_btn_play" data-icon="audio">Play</a></li>
+						<li><a href="#" class="pilla_btn_Stop" data-icon="forbidden">Stop</a></li>
+						<li><a href="#" class="pilla_btn_previous" data-icon="carat-l">Previous</a></li>
+						<li><a href="#" class="pilla_btn_next" data-icon="carat-r">Next</a></li>
+						<li><a href="#" class="pilla_btn_pause" data-icon="bars">Pause</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<ul data-role="listview" data-inset="true" id="pilla_playlist_list" data-theme="a">
+					<li data-icon="carat-r"><a href="#" class="pilla_a_music_file">Music1</a><a href="#musicInfoPage" class="pilla_a_music_act">link</a></li>
+					<li data-icon="carat-r"><a href="#" class="pilla_a_music_file">Music2</a><a href="#musicInfoPage" class="pilla_a_music_act">link</a></li>
+				</ul>
+			</div>
+
+			<div data-role="footer" data-position="fixed" class="ui-btn">
+				<a href="#popupYnPage" class="pilla_btn_delete" data-rel="popup" data-role="button" data-position-to="window">Delete Playlist</a>
+				<a href="#songPage" class="pilla_btn_addsong" data-role="button">Add Song</a>
+				<a href="#" class="pilla_btn_play_menu" data-role="button">Play Menu</a>
+			</div> 
+		</div> 
+
+
+		<!-- Music Info page -->
+		<div data-role="page" id="musicInfoPage">
+			<div data-role="header">
+				<a href="#" data-role="button" data-icon="back" data-rel="back">Back</a>
+				<h1 id="musicInfoPageHeaderMsg">Music Filename</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#popupYnPage" class="pilla_btn_delete" data-rel="popup" data-role="button" data-position-to="window">Remove from Playlist</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<div id="musicInfoPageContentMsg">
+					<h3> File path: XXXX/XXX/XXX </h3>
+					<h3> File size: XXXX </h3>
+					<h3> Last modified time: XXXX </h3>
+				</div>
+			</div>
+		</div> 
+
+		<!-- Sond page -->
+		<div data-role="page" id="songPage">
+			<div data-role="header">
+				<a href="#" data-role="button" data-icon="back" data-rel="back">Back</a>
+				<h1 id="songPageHeaderMsg">Playlist Name</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#" class="pilla_btn_home" data-icon="home">Home</a></li>
+						<li><a href="#" class="pilla_btn_up" data-icon="arrow-u">Up</a></li>
+						<li><a href="#" class="pilla_btn_ok" data-icon="check">Ok</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div data-role="main" class="ui-content">
+				<h3 id="songPagePathMsg" style="word-wrap: break-word !important">Path: /music/...</h3>
+				<ul data-role="listview" data-inset="true" id="pilla_song_list">
+					<li data-icon="carat-r" data-theme="a"><a href="#">Dir1<span class="ui-li-count">3</span></a><a href="#">link</a></li>
+					<li data-icon="carat-r" data-theme="b"><a href="#">Dir2<span class="ui-li-count">59</span></a><a href="#">link</a></li>
+					<li data-icon="false" data-theme="b"><a href="#">File1</a></li>
+					<li data-icon="false" data-theme="a"><a href="#">File2</a></li>
+				</ul>
+			</div>
+		</div>
+
+	</body>
+
+</html>
