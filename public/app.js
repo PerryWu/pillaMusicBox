@@ -119,8 +119,8 @@
 		});
 	};
 
-	function ajaxReqNewPlaylist(action) {
-		showLoading();
+	function ajaxReqControl(action) {
+		//showLoading();
 		$.ajax( {
 			url: '/musicbox',
 			method: 'POST',
@@ -128,16 +128,16 @@
 			//processData: false,
 			//contentType: 'application/json',
 			//dataType: 'json',
-		timeout: 10000})
+			timeout: 10000})
 		.done(function(data) {
-			hideLoading();
+			//hideLoading();
 			})
-			.fail(function(jqXHR, textStatus) {
-				hideLoading();
-				$(':mobile-pagecontainer').pagecontainer('change', '#mainPage');
-				console.log('fail callback. xhr:' + textStatus);
-				console.log(jqXHR);
-			});
+		.fail(function(jqXHR, textStatus) {
+			//hideLoading();
+			$(':mobile-pagecontainer').pagecontainer('change', '#mainPage');
+			console.log('fail callback. xhr:' + textStatus);
+			console.log(jqXHR);
+		});
 	};
 
 	// Resource: playlist
@@ -528,9 +528,19 @@
 			ajaxReqControl({action:'pause'});
 		});
 
-		$("#playMenuVolume").on("stop", function(e) {
-			console.log('value:' +$(this).val());
+		$(document).on('slidestop', '#playMenuVolume', function(e) {
+			console.log('volume value:' +$(this).val());
 			ajaxReqControl({action:'volume', value:$(this).val()});
+		});
+
+		$(document).on('slidestop', '#playMenuTrackPos', function(e) {
+			console.log('trackPos value:' +$(this).val());
+			ajaxReqControl({action:'trackpos', value:$(this).val()});
+		});
+
+		$(document).on('change', '#playMenuPlayMode', function(e) {
+			console.log('select value:' +$(this).val());
+			ajaxReqControl({action:'playmode', value:$(this).val()});
 		});
 
 		/*
