@@ -127,8 +127,8 @@
 			method: 'POST',
 			data: JSON.stringify(action),
 			//processData: false,
-			//contentType: 'application/json',
-			//dataType: 'json',
+			contentType: 'application/json',
+			dataType: 'json',
 			timeout: 10000})
 		.done(function(data) {
 			//hideLoading();
@@ -327,9 +327,10 @@
 	//
 	function pillaUpdatePlaylist(playlist) {
 		$('#pilla_playlist_list').empty();
+		lastAction.playlist = playlist.name;
 		$('#playlistPageHeaderMsg').text(playlist.name);
 		for(i = 0; i < playlist.items.length; i++) {
-			var	liEntry = $('<li data-icon="carat-r">').html('<a href="#" class="pilla_a_music">' + playlist.items[i].name + '<span class="ui-li-count">' + humanSeconds(playlist.items[i].length) + '</a><a href="#" class="pilla_a_music_act">link</a>');
+			var	liEntry = $('<li data-icon="carat-r">').html('<a href="#" class="pilla_a_music">' + playlist.items[i].name + '<span class="ui-li-count">' + humanSeconds(playlist.items[i].mp3len) + '</a><a href="#" class="pilla_a_music_act">link</a>');
 
 			if(playlist.items[i].default === 1) {
 				liEntry.attr('data-theme','b');
@@ -378,9 +379,9 @@
 	//
 	function pillaUpdateMusicInfo(music) {
 		//$('#pilla_playmenu_list').empty();
-		$('#musicInfoPageHeaderMsg').text(music.fName);
-		$('#musicInfoFileName').text(music.fName);
-		$('#musicInfoFilePath').text(music.fPath);
+		$('#musicInfoPageHeaderMsg').text(music.name);
+		$('#musicInfoFileName').text(music.name);
+		$('#musicInfoFilePath').text(music.path);
 		$('#musicInfoFileLength').text(humanSeconds(music.length));
 		$('#musicInfoAudio').text(music.audio);
 	}
@@ -397,12 +398,16 @@
 		for(i = 0; i < songs.items.length; i++) {
 			var liEntry;
 			if(songs.items[i].type === false) {
-				liEntry = $('<li data-icon="false">').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + humanSeconds(songs.items[i].mp3len) + '</span></a>');
+				if(songs.items[i].mp3valid === 1) {
+					liEntry = $('<li data-icon="false">').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + humanSeconds(songs.items[i].mp3len) + '</span></a>');
+				} else {
+					liEntry = $('<li data-icon="false">').html('<a href="#" class="pilla_a_songname"><i class="fa ' + getFileIcon(songs.items[i].ext) + '"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">Not Audio</span></a>');
+				}
 			} else {
 				liEntry = $('<li>').html('<a href="#" class="pilla_a_songname"><i class="fa fa-folder"></i>&nbsp;&nbsp;' + songs.items[i].name + '<span class="ui-li-count">' + songs.items[i].count + '</span></a><a href="#" class="pilla_a_songlink">link</a>');
 			}
 
-			if(selectedSongs[songs.items[i].path] === 1) {
+			if(selectedSongs[songs.items[i].path] != null) {
 				liEntry.attr('data-theme','b');
 			}
 
@@ -418,8 +423,10 @@
 
 		$(document).on('click', '.pilla_a_plName', function(e) {
 			console.log('main page name');
+			var liData = $(this).parent('li').data()
 			$('#pilla_main_list li a').removeClass('ui-btn-b');
 			$(this).parent('li').children('a').addClass('ui-btn-b');
+			lastAction.playlist = liData.name;
 		});
 
 		$(document).on('click', '.pilla_a_plLink', function(e) {
@@ -432,12 +439,13 @@
 			console.log('playlist page music');
 			$('#pilla_playlist_list li a').removeClass('ui-btn-b');
 			$(this).parent('li').children('a').addClass('ui-btn-b');
+			lastAction.songIndex = $(this).parent('li').index();
 		});
 
 		$(document).on('click', '.pilla_a_music_act', function(e) {
 			console.log('playlist page music act');
 			console.log($(this).parent('li').data());
-			ajaxReqMusicInfo($(this).parent('li').data().name);
+			ajaxReqMusicInfo($(this).parent('li').data().path);
 		});
 
 		$(document).on('click', '.pilla_a_songname', function(e) {
@@ -448,7 +456,7 @@
 				delete selectedSongs[liData.path];
 			} else {
 				$(this).parent('li').children('a').addClass('ui-btn-b');
-				selectedSongs[liData.path] = 1;
+				selectedSongs[liData.path] = liData;
 			}
 			$('#songPageSelectedCountMsg').text('Selected Count: ' +Object.keys(selectedSongs).length);
 		});
@@ -485,6 +493,7 @@
 			console.log('remove music');
 			lastAction.target = "music";
 			lastAction.name = musicItem.name;
+			lastAction.index = $('#pilla_playlist_list li a.ui-btn-b').parent('li').index();
 			lastAction.playlist = $('#playlistPageHeaderMsg').text();
 		});
 
@@ -492,7 +501,7 @@
 			if(lastAction.target === 'playlist') {
 				ajaxReqDeletePlaylist(lastAction.name);
 			} else if(lastAction.target === 'music') {
-				ajaxReqRemoveSong({name: lastAction.name, playlist:lastAction.playlist});
+				ajaxReqRemoveSong({name: lastAction.name, index: lastAction.index, playlist:lastAction.playlist});
 			}
 		});
 
@@ -502,8 +511,8 @@
 		});
 
 		$(".pilla_btn_ok").on("click", function(e) {
-			console.log(Object.keys(selectedSongs));
-			ajaxReqAddSong($('#playlistPageHeaderMsg').text(), Object.keys(selectedSongs));
+			console.log(selectedSongs);
+			ajaxReqAddSong($('#playlistPageHeaderMsg').text(), selectedSongs);
 		});
 
 		$(".pilla_btn_reset").on("click", function(e) {
@@ -513,7 +522,7 @@
 		});
 
 		$(".pilla_btn_play").on("click", function(e) {
-			ajaxReqControl({action:'play'});
+			ajaxReqControl({action:'play', playlist: lastAction.playlist, songIndex: lastAction.songIndex});
 		});
 
 		$(".pilla_btn_stop").on("click", function(e) {

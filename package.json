@@ -16,6 +16,7 @@
     "lodash": "^3.6.0",
     "method-override": "~2.3.2",
     "morgan": "~1.5.2",
-    "through": "^2.3.7"
+    "through": "^2.3.7",
+    "node-mplayer": "0.0.3"
   }
 }

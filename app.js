@@ -13,12 +13,16 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var errorhandler = require('errorhandler');
+
 var playlist = require('./lib/playlist');
 var filelist = require('./lib/filelist');
+var musicinfo = require('./lib/musicinfo');
+var musicbox = require('./lib/musicbox');
+var musicboxApp = new musicbox(playlist);
+
 var dir = process.argv[2] || "/home/perry/Music";
 filelist.defaultDir = dir;
 
-var _ = require('lodash');
 var util = require('util');
 var async = require('async');
 
@@ -43,19 +47,11 @@ app.get('/', function(req, res){
 	res.redirect('index.html');
 });
 
-app.get('/musicbox', function(req, res) {
-	res.json({plName:'musicstatusxx', plMode:3 ,volume:40, trackName:'love story', trackPos: 70, trackLength:80});
-});
+app.get('/musicbox', musicboxApp.getBoxInfo);
 
-app.post('/musicbox', function(req, res) {
-	console.log(req.body);
-	res.json({status: 'done'});
-});
+app.post('/musicbox', musicboxApp.reqBoxActions);
 
-app.get('/musicinfo', function(req, res) {
-	console.log(req.query);
-	res.json({fName:'musicstatusxx', fPath:'/music/test/a/xxx.mp3' , audio:'192 kbps, 44 kHz (stereo)', length:123});
-});
+app.get('/musicinfo', musicinfo.getMusicInfo);
 
 app.get('/playlist', playlist.getPlaylist);
 
