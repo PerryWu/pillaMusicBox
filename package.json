@@ -17,6 +17,6 @@
     "method-override": "~2.3.2",
     "morgan": "~1.5.2",
     "through": "^2.3.7",
-    "node-mplayer": "0.0.3"
+    "readline2": "~0.1.1"
   }
 }

@@ -182,12 +182,12 @@
 		});
 	};
 
-	function ajaxReqDeletePlaylist(playlist) {
+	function ajaxReqDeletePlaylist(plName) {
 		showLoading();
 		$.ajax( {
 			url: '/playlist',
 			method: 'PUT',
-			data: {playlist: encodeURIComponent(playlist)},
+			data: {plName: encodeURIComponent(plName)},
 			//processData: false,
 			//contentType: 'application/json',
 			//dataType: 'json',
@@ -204,10 +204,10 @@
 	};
 
 	// Resoruce: songs
-	function ajaxReqSongs(playlist) {
+	function ajaxReqSongs(plName) {
 		showLoading();
 		$.ajax( {
-			url: '/songs?name=' + playlist,
+			url: '/songs?plName=' + plName,
 			method: 'GET',
 		timeout: 10000})
 		.done(function(data) {
@@ -242,24 +242,24 @@
 			});
 	};
 
-	function ajaxReqAddSong(playlist, items) {
+	function ajaxReqAddSong(plName, items) {
 		showLoading();
 		$.ajax( {
 			url: '/songs',
 			method: 'POST',
-			data: JSON.stringify({playlist:playlist, items:items}),
+			data: JSON.stringify({plName:plName, items:items}),
 			//processData: false,
 			contentType: "application/json",
 			//dataType: 'json',
 		timeout: 10000})
 		.done(function(data) {
 			hideLoading();
-			ajaxReqSongs(playlist);
+			ajaxReqSongs(plName);
 			$(':mobile-pagecontainer').pagecontainer('change', '#playlistPage');
 			console.log("done callback. data:" + data);})
 			.fail(function(jqXHR, textStatus) {
 				hideLoading();
-				ajaxReqSongs(playlist);
+				ajaxReqSongs(plName);
 				$(':mobile-pagecontainer').pagecontainer('change', '#platlistPage');
 				console.log("fail callback. xhr:" + textStatus);
 				console.log(jqXHR);
@@ -522,7 +522,7 @@
 		});
 
 		$(".pilla_btn_play").on("click", function(e) {
-			ajaxReqControl({action:'play', playlist: lastAction.playlist, songIndex: lastAction.songIndex});
+			ajaxReqControl({action:'play', plName: lastAction.playlist, songIndex: lastAction.songIndex});
 		});
 
 		$(".pilla_btn_stop").on("click", function(e) {
