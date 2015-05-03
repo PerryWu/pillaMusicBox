@@ -1,7 +1,8 @@
 (function($) {
 
-	var trackUpdater = null;
+	var boxUpdater = null;
 	var lastAction = {};
+	var lastBoxStatus = {};
 	var selectedSongs = {};
 	var currentSongPath = '';
 
@@ -51,10 +52,10 @@
 
 	// Seconds to m:s format
 	function humanSeconds(seconds) {
-		var local_min = Math.floor(Number.parseInt(seconds) / 60);
-		var local_sec = Number.parseInt(seconds) % 60;
+		var local_min = Math.floor(parseInt(seconds, 10) / 60);
+		var local_sec = parseInt(seconds) % 60;
 
-		console.log("seconds:" + seconds + "min:" + local_min);
+		//console.log("seconds:" + seconds + "min:" + local_min);
 		return local_min.toString() + ':' + padLeft(local_sec.toString(), 2);
 	}
 
@@ -75,7 +76,7 @@
 			return str;
 		} else {
 			return padLeft("0" + str, len);
-		}   
+		}
 	}
 
 	//
@@ -102,7 +103,7 @@
 	//
 
 	// Resource: musicbox
-	function ajaxReqPlayStatus(redirect) {
+	function ajaxReqBoxStatus(redirect) {
 		//showLoading();
 		$.ajax( {
 			url: '/musicbox',
@@ -110,9 +111,12 @@
 		timeout: 10000})
 		.done(function(data) {
 			//hideLoading();
-			if(redirect === 1)
+			if(redirect === 1) {
 				$(':mobile-pagecontainer').pagecontainer('change', '#playMenuPage');
-			pillaUpdatePlayMenu(data);
+				pillaUpdatePlayMenu(data);
+			} else {
+				pillaSyncBoxInfo(data);
+			}
 		})
 		.fail(function(jqXHR, textStatus) {
 			hideLoading();
@@ -330,9 +334,9 @@
 		lastAction.playlist = playlist.name;
 		$('#playlistPageHeaderMsg').text(playlist.name);
 		for(i = 0; i < playlist.items.length; i++) {
-			var	liEntry = $('<li data-icon="carat-r">').html('<a href="#" class="pilla_a_music">' + playlist.items[i].name + '<span class="ui-li-count">' + humanSeconds(playlist.items[i].mp3len) + '</a><a href="#" class="pilla_a_music_act">link</a>');
+			var	liEntry = $('<li data-icon="carat-r">').html('<a href="#" class="pilla_a_music">' + playlist.items[i].name + '<span class="ui-li-count">' + humanSeconds(playlist.items[i].mp3len) + '</span></a><a href="#" class="pilla_a_music_act">link</a>');
 
-			if(playlist.items[i].default === 1) {
+			if(playlist.items[i].default == 1) {
 				liEntry.attr('data-theme','b');
 			}
 			liEntry.data(playlist.items[i]);
@@ -340,6 +344,12 @@
 			$('#pilla_playlist_list').append(liEntry);
 		}
 		$('#pilla_playlist_list').listview('refresh');
+	}
+
+	// Playlist page: to update the selection theme by given index
+	function pillaUpdatePlaylistSelection(index) {
+		$('#pilla_playlist_list li a').removeClass('ui-btn-b');
+		$('#pilla_playlist_list li:nth-child(' + index +')').children('a').addClass('ui-btn-b');
 	}
 
 	//
@@ -362,7 +372,7 @@
 		/*
 		trackUpdater = window.setInterval(function() {
 			//var trackPos = $('#playMenuTrackPos').val();
-			var trackPos = Number.parseInt($('#playMenuTrackPos').val());
+			var trackPos = parseInt($('#playMenuTrackPos').val());
 			$('#playMenuTrackPos').val(trackPos + 1);
 			if( (trackPos + 1) == $('#playMenuTrackPos').attr('max')) {
 				window.clearInterval(trackUpdater);
@@ -372,6 +382,27 @@
 			$('#playMenuTrackPos').slider('refresh');
 		}, 1000);
 		*/
+	}
+
+	//
+	// Play Menu Page: to update play menu by given items
+	//
+	function pillaSyncBoxInfo(mb) {
+		//console.log('lastAction.page=(' + lastAction.page +'). mbTrackIndex: (' + mb.trackIndex +')');
+		if(lastAction.page == '#playlistPage') {
+			if(lastBoxStatus.trackIndex != mb.trackIndex) {
+				var index = parseInt(mb.trackIndex) + 1;
+				pillaUpdatePlaylistSelection(index);
+			}
+		} else if(lastAction.page == '#playMenuPage') {
+			if(lastBoxStatus.trackPos != mb.trackPos || lastBoxStatus.trackIndex != mb.trackIndex) {
+				pillaUpdatePlayMenu(mb);
+			}
+		}
+		
+		lastBoxStatus.playlist = mb.plName;
+		lastBoxStatus.trackIndex = mb.trackIndex;
+		lastBoxStatus.trackPos = mb.trackPos;
 	}
 
 	//
@@ -392,7 +423,7 @@
 	function pillaUpdateSongList(songs) {
 		$('#pilla_song_list').empty();
 		$('#songPageHeaderMsg').text($('#playlistPageHeaderMsg').text());
-		$('#songPageSelectedCountMsg').text('Selected Count: 0');
+		$('#songPageSelectedCountMsg').text('Selected Count: ' + Object.keys(selectedSongs).length);
 		$('#songPagePathMsg').text('Path: ' + songs.path);
 
 		for(i = 0; i < songs.items.length; i++) {
@@ -421,104 +452,16 @@
 		// First run, load the list
 		ajaxReqPlaylist();
 
-		$(document).on('click', '.pilla_a_plName', function(e) {
-			console.log('main page name');
-			var liData = $(this).parent('li').data()
-			$('#pilla_main_list li a').removeClass('ui-btn-b');
-			$(this).parent('li').children('a').addClass('ui-btn-b');
-			lastAction.playlist = liData.name;
-		});
+		//
+		// General Actions & Events
+		//
+		boxUpdater = window.setInterval(function() {
+			ajaxReqBoxStatus(0);
+		}, 5000);
 
-		$(document).on('click', '.pilla_a_plLink', function(e) {
-			console.log('main page link');
-			console.log($(this).parent('li').data());
-			ajaxReqSongs($(this).parent('li').data().name);
-		});
-
-		$(document).on('click', '.pilla_a_music', function(e) {
-			console.log('playlist page music');
-			$('#pilla_playlist_list li a').removeClass('ui-btn-b');
-			$(this).parent('li').children('a').addClass('ui-btn-b');
-			lastAction.songIndex = $(this).parent('li').index();
-		});
-
-		$(document).on('click', '.pilla_a_music_act', function(e) {
-			console.log('playlist page music act');
-			console.log($(this).parent('li').data());
-			ajaxReqMusicInfo($(this).parent('li').data().path);
-		});
-
-		$(document).on('click', '.pilla_a_songname', function(e) {
-			console.log('song page name');
-			var liData = $(this).parent('li').data()
-			if($(this).hasClass('ui-btn-b') === true) {
-				$(this).parent('li').children('a').removeClass('ui-btn-b');
-				delete selectedSongs[liData.path];
-			} else {
-				$(this).parent('li').children('a').addClass('ui-btn-b');
-				selectedSongs[liData.path] = liData;
-			}
-			$('#songPageSelectedCountMsg').text('Selected Count: ' +Object.keys(selectedSongs).length);
-		});
-
-		$(document).on('click', '.pilla_a_songlink', function(e) {
-			console.log('song page link');
-			console.log($(this).parent('li').data());
-			// If the folder is selected, no need to enter the folder for more selections.
-			if($(this).hasClass('ui-btn-b') === true)
-				return;
-			ajaxReqSongList($(this).parent('li').data().path);
-		});
-
-		$('#pilla_btn_newPlName').on('click', function(e) {
-			ajaxReqNewPlaylist();
-		});
-
-		$('.pilla_btn_play_menu').on('click', function(e) {
-			console.log('play_menu');
-			ajaxReqPlayStatus(1);
-		});
-
-		$('#mainPage .pilla_btn_delete').on('click', function(e) {
-			var plItem = $('#pilla_main_list li a.ui-btn-b').parent('li').data();
-			$("#ynPageConfirmationMsg").text('Are you sure the delete playlist "'+ plItem.name + '"?');
-			console.log("selected item is " + plItem.name);
-			lastAction.target = 'playlist';
-			lastAction.name = plItem.name;
-		});
-
-		$('#playlistPage .pilla_btn_delete').on('click', function(e) {
-			var musicItem = $('#pilla_playlist_list li a.ui-btn-b').parent('li').data();
-			$("#ynPageConfirmationMsg").text('Are you sure to remove "'+ musicItem.name + '" from playlist?');
-			console.log('remove music');
-			lastAction.target = "music";
-			lastAction.name = musicItem.name;
-			lastAction.index = $('#pilla_playlist_list li a.ui-btn-b').parent('li').index();
-			lastAction.playlist = $('#playlistPageHeaderMsg').text();
-		});
-
-		$("#pilla_btn_y").on("click", function(e) {
-			if(lastAction.target === 'playlist') {
-				ajaxReqDeletePlaylist(lastAction.name);
-			} else if(lastAction.target === 'music') {
-				ajaxReqRemoveSong({name: lastAction.name, index: lastAction.index, playlist:lastAction.playlist});
-			}
-		});
-
-		$(".pilla_btn_addsong").on("click", function(e) {
-			selectedSongs = {};
-			ajaxReqSongList('');
-		});
-
-		$(".pilla_btn_ok").on("click", function(e) {
-			console.log(selectedSongs);
-			ajaxReqAddSong($('#playlistPageHeaderMsg').text(), selectedSongs);
-		});
-
-		$(".pilla_btn_reset").on("click", function(e) {
-			selectedSongs = {};
-			$('#pilla_song_list li a').removeClass('ui-btn-b');
-			$('#songPageSelectedCountMsg').text('Selected Count: 0');
+		$(document).on('pageshow', function(e) {
+			//console.log(location.hash);
+			lastAction.page = location.hash;
 		});
 
 		$(".pilla_btn_play").on("click", function(e) {
@@ -541,6 +484,136 @@
 			ajaxReqControl({action:'pause'});
 		});
 
+		$('.pilla_btn_play_menu').on('click', function(e) {
+			console.log('play_menu');
+			ajaxReqBoxStatus(1);
+		});
+
+		$("#pilla_btn_y").on("click", function(e) {
+			if(lastAction.target === 'playlist') {
+				ajaxReqDeletePlaylist(lastAction.name);
+			} else if(lastAction.target === 'music') {
+				ajaxReqRemoveSong({name: lastAction.name, index: lastAction.index, playlist:lastAction.playlist});
+			}
+		});
+
+		//
+		// MainPage Actions & Events
+		//
+		$(document).on('click', '.pilla_a_plName', function(e) {
+			//console.log('main page name');
+			var liData = $(this).parent('li').data()
+			$('#pilla_main_list li a').removeClass('ui-btn-b');
+			$(this).parent('li').children('a').addClass('ui-btn-b');
+			lastAction.playlist = liData.name;
+		});
+
+		$(document).on('click', '.pilla_a_plLink', function(e) {
+			//console.log('main page link');
+			//console.log($(this).parent('li').data());
+			ajaxReqSongs($(this).parent('li').data().name);
+		});
+
+		$('#pilla_btn_newPlName').on('click', function(e) {
+			ajaxReqNewPlaylist();
+		});
+
+		$('#mainPage .pilla_btn_delete').on('click', function(e) {
+			var plItem = $('#pilla_main_list li a.ui-btn-b').parent('li').data();
+			$("#ynPageConfirmationMsg").text('Are you sure the delete playlist "'+ plItem.name + '"?');
+			console.log("selected item is " + plItem.name);
+			lastAction.target = 'playlist';
+			lastAction.name = plItem.name;
+		});
+
+		//
+		// PlaylistPage Actions & Events
+		//
+		$(document).on('click', '.pilla_a_music', function(e) {
+			//console.log('playlist page music');
+			$('#pilla_playlist_list li a').removeClass('ui-btn-b');
+			$(this).parent('li').children('a').addClass('ui-btn-b');
+			lastAction.songIndex = $(this).parent('li').index();
+		});
+
+		$(document).on('click', '.pilla_a_music_act', function(e) {
+			//console.log('playlist page music act');
+			//console.log($(this).parent('li').data());
+			ajaxReqMusicInfo($(this).parent('li').data().path);
+		});
+
+		$('#playlistPage .pilla_btn_back').on('click', function(e) {
+			console.log('playlist back detect!');
+			ajaxReqPlaylist();
+		});
+
+		$('#playlistPage .pilla_btn_delete').on('click', function(e) {
+			var musicItem = $('#pilla_playlist_list li a.ui-btn-b').parent('li').data();
+			$("#ynPageConfirmationMsg").text('Are you sure to remove "'+ musicItem.name + '" from playlist?');
+			console.log('remove music');
+			lastAction.target = "music";
+			lastAction.name = musicItem.name;
+			lastAction.index = $('#pilla_playlist_list li a.ui-btn-b').parent('li').index();
+			lastAction.playlist = $('#playlistPageHeaderMsg').text();
+		});
+
+		$(".pilla_btn_addsong").on("click", function(e) {
+			selectedSongs = {};
+			ajaxReqSongList('');
+		});
+
+		//
+		// SongPage Actions & Events
+		//
+		$(document).on('click', '.pilla_a_songname', function(e) {
+			console.log('song page name');
+			var liData = $(this).parent('li').data()
+			if($(this).hasClass('ui-btn-b') == true) {
+				$(this).parent('li').children('a').removeClass('ui-btn-b');
+				delete selectedSongs[liData.path];
+			} else {
+				$(this).parent('li').children('a').addClass('ui-btn-b');
+				selectedSongs[liData.path] = liData;
+			}
+			$('#songPageSelectedCountMsg').text('Selected Count: ' + Object.keys(selectedSongs).length);
+		});
+
+		$(document).on('click', '.pilla_a_songlink', function(e) {
+			console.log('song page link');
+			console.log($(this).parent('li').data());
+			// If the folder is selected, no need to enter the folder for more selections.
+			if($(this).hasClass('ui-btn-b') === true) {
+				alert('All songs in this folder are selected, unselect the folder if you want to select individual songs.');
+				return;
+			}
+			ajaxReqSongList($(this).parent('li').data().path);
+		});
+
+		$(".pilla_btn_ok").on("click", function(e) {
+			console.log(selectedSongs);
+			ajaxReqAddSong($('#playlistPageHeaderMsg').text(), selectedSongs);
+		});
+
+		$(".pilla_btn_reset").on("click", function(e) {
+			selectedSongs = {};
+			$('#pilla_song_list li a').removeClass('ui-btn-b');
+			$('#songPageSelectedCountMsg').text('Selected Count: 0');
+		});
+
+		$(".pilla_btn_up").on("click", function(e){
+			if (!currentSongPath) return;
+			var idx = currentSongPath.lastIndexOf("/");
+			var path = currentSongPath.substr(0, idx);
+			ajaxReqSongList(path);
+		});
+
+		$(".pilla_btn_home").on("click", function(e){
+			ajaxReqSongList('');
+		});
+
+		//
+		// PlayMenuPage Actions & Events
+		//
 		$(document).on('slidestop', '#playMenuVolume', function(e) {
 			console.log('volume value:' +$(this).val());
 			ajaxReqControl({action:'volume', value:$(this).val()});
@@ -556,26 +629,6 @@
 			ajaxReqControl({action:'playmode', value:$(this).val()});
 		});
 
-		$(".pilla_btn_up").on("click", function(e){
-			if (!currentSongPath) return;
-			var idx = currentSongPath.lastIndexOf("/");
-			var path = currentSongPath.substr(0, idx);
-			ajaxReqSongList(path);
-		});
-
-		$(".pilla_btn_home").on("click", function(e){
-			ajaxReqSongList('');
-		});
-
-		/*
-		$("#treePage .pilla_btn_up").on("click", function(e){
-		if (!currentTreePath) return;
-		var idx = currentTreePath.lastIndexOf("/");
-		var path = currentTreePath.substr(0, idx);
-		ajaxReqFolderList('/folders?path=' + path, path);
-		$(':mobile-pagecontainer').pagecontainer('change', '#treePage');
-		});
-		*/
 	});
 
 })(jQuery);

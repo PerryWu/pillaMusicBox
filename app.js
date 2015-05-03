@@ -41,7 +41,6 @@ app.use(session({
 	saveUninitialized: false, // don't create session until something stored
 	secret: 'pilla, very secret'
 }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
 	res.redirect('index.html');
@@ -78,7 +77,30 @@ if ('development' == app.get('env')) {
 	app.use(errorhandler());
 }
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
 
+process.on('uncaughtException', function(err){
+	//Is this our connection refused exception?
+	if( err.message.indexOf("ECONNREFUSED") > -1 ) {
+		//Safer to shut down instead of ignoring
+		//See: http://shapeshed.com/uncaught-exceptions-in-node/
+		console.error("Waiting for CLI connection to come up. Restarting in 2 second...");
+		setTimeout(shutdownProcess, 2000); 
+	} else {
+		//This is some other exception.. 
+		console.error('uncaughtException: ' + err.message);
+		console.error(err.stack);
+		shutdownProcess();
+	}
+});
+
+// Restarts the process. Since forever is managing this process it's safe to shut down
+// it will be restarted.  If we ignore exceptions it could lead to unstable behavior.
+// Exit and let the forever utility restart everything
+function shutdownProcess() {
+	process.exit(1); //exit with error
+}

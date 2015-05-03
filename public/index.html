@@ -65,10 +65,18 @@
 				</ul>
 			</div>
 
-			<div data-role='footer' data-position='fixed' class='ui-btn'>
-				<a href='#newPlaylistPage' class='pilla_btn_new_pl' data-icon='plus' data-role='button'>New Playlist</a>
-				<a href='#popupYnPage' class='pilla_btn_delete' data-icon='delete' data-rel='popup' data-role='button' data-position-to='window'>Delete Playlist</a>
-				<a href='#' class='pilla_btn_play_menu' data-icon='bullets' data-role='button'>Play Menu</a>
+			<div data-role='footer' data-position='fixed' class='ui-btn-inline' style="text-align:center;">
+				<div class="ui-grid-b">
+					<div class="ui-block-a">
+						<a href='#newPlaylistPage' class='pilla_btn_new_pl ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-plus'>New Playlist</a>
+					</div>
+					<div class="ui-block-b">
+						<a href='#popupYnPage' class='pilla_btn_delete ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-delete' data-rel='popup' data-position-to='window'>Delete Playlist</a>
+					</div>
+					<div class="ui-block-c">
+						<a href='#' class='pilla_btn_play_menu ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-bullets'>Play Menu</a>
+					</div>
+				</div>
 			</div> 
 		</div> 
 
@@ -93,7 +101,7 @@
 		<!-- Play Menu Page -->
 		<div data-role='page' id='playMenuPage'>
 			<div data-role='header'>
-				<a href='#' data-role='button' data-icon='back' data-rel='back'>Back</a>
+				<a href='#' class='pilla_btn_back' data-role='button' data-icon='back' data-rel='back'>Back</a>
 				<h1>Play Menu</h1>
 				<div data-role='navbar'>
 					<ul>
@@ -149,7 +157,7 @@
 		<!-- Playlist page -->
 		<div data-role='page' id='playlistPage'>
 			<div data-role='header'>
-				<a href='#' data-role='button' data-icon='back' data-rel='back'>Back</a>
+				<a href='#' class='pilla_btn_back' data-role='button' data-icon='back' data-rel='back'>Back</a>
 				<h1 id='playlistPageHeaderMsg'>Playlist Name</h1>
 				<div data-role='navbar'>
 					<ul>
@@ -169,10 +177,18 @@
 				</ul>
 			</div>
 
-			<div data-role='footer' data-position='fixed' class='ui-btn'>
-				<a href='#' class='pilla_btn_addsong' data-icon='plus' data-role='button'>Add Song</a>
-				<a href='#popupYnPage' class='pilla_btn_delete' data-icon='delete' data-rel='popup' data-role='button' data-position-to='window'>Remove Song</a>
-				<a href='#' class='pilla_btn_play_menu' data-icon='bullets' data-role='button'>Play Menu</a>
+			<div data-role='footer' data-position='fixed' class='ui-btn-inline' style="text-align:center;">
+				<div class="ui-grid-b">
+					<div class="ui-block-a">
+						<a href='#' class='pilla_btn_addsong ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-plus'>Add Song</a>
+					</div>
+					<div class="ui-block-b">
+						<a href='#popupYnPage' class='pilla_btn_delete ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-delete' data-rel='popup' data-position-to='window'>Remove song</a>
+					</div>
+					<div class="ui-block-c">
+						<a href='#' class='pilla_btn_play_menu ui-btn-icon-top ui-corner-all ui-btn-inline ui-btn ui-icon-bullets'>Play Menu</a>
+					</div>
+				</div>
 			</div> 
 		</div> 
 
