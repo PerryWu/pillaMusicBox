@@ -1,6 +1,6 @@
 /**
-* Module dependencies.
-*/
+ * Module dependencies.
+ */
 
 var express = require('express');
 var http = require('http');
@@ -34,16 +34,18 @@ app.set('view engine', 'html');
 app.use(logger(':method :url'));
 app.use(methodOverride('_method'));
 app.use(cookieParser('pilla'));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.json());
 app.use(session({
-	resave: false, // don't save session if unmodified
-	saveUninitialized: false, // don't create session until something stored
-	secret: 'pilla, very secret'
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    secret: 'pilla, very secret'
 }));
 
-app.get('/', function(req, res){
-	res.redirect('index.html');
+app.get('/', function(req, res) {
+    res.redirect('index.html');
 });
 
 app.get('/musicbox', musicboxApp.getBoxInfo);
@@ -74,33 +76,33 @@ app.get('/folders', fileList.getFolderList);
 
 // development only
 if ('development' == app.get('env')) {
-	app.use(errorhandler());
+    app.use(errorhandler());
 }
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-http.createServer(app).listen(app.get('port'), function(){
-	console.log('Express server listening on port ' + app.get('port'));
+http.createServer(app).listen(app.get('port'), function() {
+    console.log('Express server listening on port ' + app.get('port'));
 });
 
-process.on('uncaughtException', function(err){
-	//Is this our connection refused exception?
-	if( err.message.indexOf("ECONNREFUSED") > -1 ) {
-		//Safer to shut down instead of ignoring
-		//See: http://shapeshed.com/uncaught-exceptions-in-node/
-		console.error("Waiting for CLI connection to come up. Restarting in 2 second...");
-		setTimeout(shutdownProcess, 2000); 
-	} else {
-		//This is some other exception.. 
-		console.error('uncaughtException: ' + err.message);
-		console.error(err.stack);
-		shutdownProcess();
-	}
+process.on('uncaughtException', function(err) {
+    //Is this our connection refused exception?
+    if (err.message.indexOf("ECONNREFUSED") > -1) {
+        //Safer to shut down instead of ignoring
+        //See: http://shapeshed.com/uncaught-exceptions-in-node/
+        console.error("Waiting for CLI connection to come up. Restarting in 2 second...");
+        setTimeout(shutdownProcess, 2000);
+    } else {
+        //This is some other exception.. 
+        console.error('uncaughtException: ' + err.message);
+        console.error(err.stack);
+        shutdownProcess();
+    }
 });
 
 // Restarts the process. Since forever is managing this process it's safe to shut down
 // it will be restarted.  If we ignore exceptions it could lead to unstable behavior.
 // Exit and let the forever utility restart everything
 function shutdownProcess() {
-	process.exit(1); //exit with error
+    process.exit(1); //exit with error
 }
