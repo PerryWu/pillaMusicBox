@@ -1,7 +1,7 @@
 (function($) {
 
 	var boxUpdater = null;
-	var lastAction = {};
+	var lastAction = {songIndex: -1, playlist: ''};
 	var lastBoxStatus = {};
 	var selectedSongs = {};
 	var currentSongPath = '';
@@ -359,6 +359,7 @@
 
 			if (playlist.items[i].default == 1) {
 				liEntry.attr('data-theme', 'b');
+				lastAction.songIndex = i;
 			}
 			liEntry.data(playlist.items[i]);
 
