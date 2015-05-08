@@ -425,6 +425,11 @@
 		lastBoxStatus.playlist = mb.plName;
 		lastBoxStatus.trackIndex = mb.trackIndex;
 		lastBoxStatus.trackPos = mb.trackPos;
+		if(mb.status == 'playing' && boxUpdater == null) {
+			boxUpdater = window.setInterval(function() {
+				ajaxReqBoxStatus(0);
+			}, 5000);
+		}
 	}
 
 	//
@@ -473,13 +478,11 @@
 	$(document).ready(function() {
 		// First run, load the list
 		ajaxReqPlaylist();
+		ajaxReqBoxStatus(0);
 
 		//
 		// General Actions & Events
 		//
-		boxUpdater = window.setInterval(function() {
-			ajaxReqBoxStatus(0);
-		}, 5000);
 
 		$(document).on('pageshow', function(e) {
 			//console.log(location.hash);
@@ -492,12 +495,22 @@
 				plName: lastAction.playlist,
 				songIndex: lastAction.songIndex
 			});
+
+			if(boxUpdater == null) {
+				boxUpdater = window.setInterval(function() {
+					ajaxReqBoxStatus(0);
+				}, 5000);
+			}
 		});
 
 		$(".pilla_btn_stop").on('click', function(e) {
 			ajaxReqControl({
 				action: 'stop'
 			});
+			if(boxUpdater != null) {
+				clearInterval(boxUpdater);
+				boxUpdater = null;
+			}
 		});
 
 		$(".pilla_btn_previous").on('click', function(e) {
