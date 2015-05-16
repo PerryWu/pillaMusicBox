@@ -107,7 +107,7 @@
 	function ajaxReqBoxStatus(redirect) {
 		//showLoading();
 		$.ajax({
-				url: '/musicbox',
+				url: 'musicbox',
 				method: 'GET',
 				timeout: 10000
 			})
@@ -129,7 +129,7 @@
 	function ajaxReqControl(action) {
 		//showLoading();
 		$.ajax({
-				url: '/musicbox',
+				url: 'musicbox',
 				method: 'POST',
 				data: JSON.stringify(action),
 				//processData: false,
@@ -152,7 +152,7 @@
 	function ajaxReqPlaylist() {
 		showLoading();
 		$.ajax({
-				url: '/playlist',
+				url: 'playlist',
 				method: 'GET',
 				timeout: 10000
 			})
@@ -170,7 +170,7 @@
 	function ajaxReqNewPlaylist() {
 		showLoading();
 		$.ajax({
-				url: '/playlist',
+				url: 'playlist',
 				method: 'POST',
 				data: $('form#newPlaylistForm').serialize(),
 				//processData: false,
@@ -195,7 +195,7 @@
 	function ajaxReqDeletePlaylist(plName) {
 		showLoading();
 		$.ajax({
-				url: '/playlist',
+				url: 'playlist',
 				method: 'PUT',
 				data: {
 					plName: encodeURIComponent(plName)
@@ -221,7 +221,7 @@
 	function ajaxReqSongs(plName) {
 		showLoading();
 		$.ajax({
-				url: '/songs?plName=' + plName,
+				url: 'songs?plName=' + plName,
 				method: 'GET',
 				timeout: 10000
 			})
@@ -239,7 +239,7 @@
 	function ajaxReqRemoveSong(song) {
 		showLoading();
 		$.ajax({
-				url: '/songs?' + $.param(song),
+				url: 'songs?' + $.param(song),
 				method: 'PUT',
 				//data: $.param(song),
 				//processData: false,
@@ -262,7 +262,7 @@
 	function ajaxReqAddSong(plName, items) {
 		showLoading();
 		$.ajax({
-				url: '/songs',
+				url: 'songs',
 				method: 'POST',
 				data: JSON.stringify({
 					plName: plName,
@@ -291,7 +291,7 @@
 	function ajaxReqSongList(path) {
 		showLoading();
 		$.ajax({
-				url: '/songlist?path=' + encodeURIComponent(path),
+				url: 'songlist?path=' + encodeURIComponent(path),
 				method: 'GET',
 				//processData: false,
 				//contentType: 'application/json',
@@ -315,7 +315,7 @@
 	function ajaxReqMusicInfo(filePath) {
 		showLoading();
 		$.ajax({
-				url: '/musicinfo?path=' + encodeURIComponent(filePath),
+				url: 'musicinfo?path=' + encodeURIComponent(filePath),
 				method: 'GET',
 				timeout: 10000
 			})
